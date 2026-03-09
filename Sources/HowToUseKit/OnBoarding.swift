@@ -38,7 +38,6 @@ public struct OnBoarding: View {
     public var items: [Item]
     public var onComplete: () -> Void
 
-    /// View Properties
     @State private var currentIndex: Int = 0
     @State private var screenshotSize: CGSize = .zero
 
@@ -85,7 +84,7 @@ public struct OnBoarding: View {
                 .padding(.horizontal, 15)
                 .frame(height: 210)
                 .background {
-                    VariableGlassBlur(18)
+                    GlassBlurBackground(18, tint: theme.glassTint)
                 }
                 BackButton()
 
@@ -95,12 +94,23 @@ public struct OnBoarding: View {
     }
 
 
+    // MARK: - Clip Shape
+
+    /// iOS 26: ConcentricRectangle / iOS 18~25: RoundedRectangle
+    var clipShape: AnyShape {
+        if #available(iOS 26, *) {
+            return AnyShape(ConcentricRectangle(corners: .concentric, isUniform: true))
+        } else {
+            return AnyShape(RoundedRectangle(cornerRadius: 44, style: .continuous))
+        }
+    }
+
 
     // MARK: - Screenshot View
 
     @ViewBuilder
     func ScreenshotView() -> some View {
-        let shape = ConcentricRectangle(corners: .concentric, isUniform: true)
+        let shape = clipShape
         GeometryReader {
             let size = $0.size
 
@@ -226,24 +236,42 @@ public struct OnBoarding: View {
 
     @ViewBuilder
     func ContinueButton() -> some View {
-        Button {
-            if currentIndex == items.count - 1 {
-                onComplete()
-            } else {
-                withAnimation(animation) {
-                    currentIndex += 1
-                }
+        let label = Text(currentIndex == items.count - 1 ? "Get Started" : "Continue")
+            .font(.custom("Inter18pt-Medium", size: 17))
+            .contentTransition(.numericText())
+            .padding(.vertical, 6)
+
+        if #available(iOS 26, *) {
+            Button {
+                handleContinue()
+            } label: {
+                label
             }
-        } label: {
-            Text(currentIndex == items.count - 1 ? "Get Started" : "Continue")
-                .font(.custom("Inter18pt-Medium", size: 17))
-                .contentTransition(.numericText())
-                .padding(.vertical, 6)
+            .tint(tint)
+            .buttonStyle(.glassProminent)
+            .buttonSizing(.flexible)
+            .padding(.horizontal, 30)
+        } else {
+            Button {
+                handleContinue()
+            } label: {
+                label
+                    .frame(maxWidth: .infinity)
+            }
+            .tint(tint)
+            .buttonStyle(.borderedProminent)
+            .padding(.horizontal, 30)
         }
-        .tint(tint)
-        .buttonStyle(.glassProminent)
-        .buttonSizing(.flexible)
-        .padding(.horizontal, 30)
+    }
+
+    private func handleContinue() {
+        if currentIndex == items.count - 1 {
+            onComplete()
+        } else {
+            withAnimation(animation) {
+                currentIndex += 1
+            }
+        }
     }
 
 
@@ -252,36 +280,65 @@ public struct OnBoarding: View {
     @ViewBuilder
     func BackButton() -> some View {
         let isHidden = hidesBackButtonOnFirstItem && currentIndex == 0
-        Button {
-            withAnimation(animation) {
-                currentIndex = max(currentIndex - 1, 0)
+
+        if #available(iOS 26, *) {
+            Button {
+                withAnimation(animation) {
+                    currentIndex = max(currentIndex - 1, 0)
+                }
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.title3)
+                    .frame(width: 20, height: 30)
             }
-        } label: {
-            Image(systemName: "chevron.left")
-                .font(.title3)
-                .frame(width: 20, height: 30)
+            .buttonStyle(.glass)
+            .buttonBorderShape(.circle)
+            .opacity(isHidden ? 0 : 1)
+            .allowsHitTesting(!isHidden)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.leading, 15)
+            .padding(.top, 5)
+        } else {
+            Button {
+                withAnimation(animation) {
+                    currentIndex = max(currentIndex - 1, 0)
+                }
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.title3)
+                    .frame(width: 20, height: 30)
+            }
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+            .opacity(isHidden ? 0 : 1)
+            .allowsHitTesting(!isHidden)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.leading, 15)
+            .padding(.top, 5)
         }
-        .buttonStyle(.glass)
-        .buttonBorderShape(.circle)
-        .opacity(isHidden ? 0 : 1)
-        .allowsHitTesting(!isHidden)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding(.leading, 15)
-        .padding(.top, 5)
     }
 
 
-    // MARK: - Variable Glass Blur
+    // MARK: - Glass Blur Background
 
     @ViewBuilder
-    func VariableGlassBlur(_ radius: CGFloat) -> some View {
-        Rectangle()
-            .fill(.clear)
-            .glassEffect(.clear.tint(theme.glassTint), in: .rect)
-            .blur(radius: radius)
-            .padding([.horizontal, .bottom], -radius * 2)
-            .opacity(items[currentIndex].zoomScale != 1 ? 1 : 0)
-            .ignoresSafeArea()
+    func GlassBlurBackground(_ radius: CGFloat, tint: Color) -> some View {
+        if #available(iOS 26, *) {
+            Rectangle()
+                .fill(.clear)
+                .glassEffect(.clear.tint(tint), in: .rect)
+                .blur(radius: radius)
+                .padding([.horizontal, .bottom], -radius * 2)
+                .opacity(items[currentIndex].zoomScale != 1 ? 1 : 0)
+                .ignoresSafeArea()
+        } else {
+            Rectangle()
+                .fill(tint)
+                .blur(radius: radius)
+                .padding([.horizontal, .bottom], -radius * 2)
+                .opacity(items[currentIndex].zoomScale != 1 ? 1 : 0)
+                .ignoresSafeArea()
+        }
     }
 
 
