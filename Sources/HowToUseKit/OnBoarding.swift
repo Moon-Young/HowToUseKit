@@ -11,7 +11,7 @@ import CoreText
 
 // MARK: - Font Registration
 
-private let registerFontsOnce: Void = {
+private nonisolated(unsafe) let registerFontsOnce: Void = {
     let fontNames = [
         "Inter_18pt-Regular",
         "Inter_18pt-Medium",
@@ -29,14 +29,18 @@ private let registerFontsOnce: Void = {
 
 // MARK: - OnBoarding
 
+@MainActor
 public struct OnBoarding: View {
     public var tint: Color
     public var hideBezels: Bool
     public var screenshotCornerRadius: CGFloat
     public var theme: Theme
     public var hidesBackButtonOnFirstItem: Bool
+    public var continueTitle: String
+    public var getStartedTitle: String
     public var items: [Item]
     public var onComplete: () -> Void
+    public var onDismiss: (() -> Void)?
 
     @State private var currentIndex: Int = 0
     @State private var screenshotSize: CGSize = .zero
@@ -47,16 +51,22 @@ public struct OnBoarding: View {
         screenshotCornerRadius: CGFloat = 70,
         theme: Theme = .dark,
         hidesBackButtonOnFirstItem: Bool = true,
+        continueTitle: String = "Continue",
+        getStartedTitle: String = "Get Started",
         items: [Item],
-        onComplete: @escaping () -> Void
+        onComplete: @escaping () -> Void,
+        onDismiss: (() -> Void)? = nil
     ) {
         self.tint = tint
         self.hideBezels = hideBezels
         self.screenshotCornerRadius = screenshotCornerRadius
         self.theme = theme
         self.hidesBackButtonOnFirstItem = hidesBackButtonOnFirstItem
+        self.continueTitle = continueTitle
+        self.getStartedTitle = getStartedTitle
         self.items = items
         self.onComplete = onComplete
+        self.onDismiss = onDismiss
         _ = registerFontsOnce
     }
 
@@ -86,17 +96,23 @@ public struct OnBoarding: View {
                 .background {
                     GlassBlurBackground(18, tint: theme.glassTint)
                 }
+
                 BackButton()
 
+                if let onDismiss {
+                    DismissButton(action: onDismiss)
+                }
             }
             .preferredColorScheme(theme.colorScheme)
+            .onAppear {
+                currentIndex = 0
+            }
         }
     }
 
 
     // MARK: - Clip Shape
 
-    /// iOS 26: ConcentricRectangle / iOS 18~25: RoundedRectangle
     var clipShape: AnyShape {
         if #available(iOS 26, *) {
             return AnyShape(ConcentricRectangle(corners: .concentric, isUniform: true))
@@ -120,9 +136,7 @@ public struct OnBoarding: View {
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 12) {
                     ForEach(items.indices, id: \.self) { index in
-
                         let item = items[index]
-
                         Group {
                             if let screenshot = item.screenshot {
                                 Image(uiImage: screenshot)
@@ -142,7 +156,6 @@ public struct OnBoarding: View {
                             }
                         }
                         .frame(width: size.width, height: size.height)
-
                     }
                 }
                 .scrollTargetLayout()
@@ -150,9 +163,7 @@ public struct OnBoarding: View {
             .scrollDisabled(true)
             .scrollTargetBehavior(.viewAligned)
             .scrollIndicators(.hidden)
-            .scrollPosition(id: .init(get: {
-                return currentIndex
-            }, set: { _ in }))
+            .scrollPosition(id: .init(get: { currentIndex }, set: { _ in }))
         }
         .clipShape(shape)
         .overlay {
@@ -180,19 +191,16 @@ public struct OnBoarding: View {
     func TextContentView() -> some View {
         GeometryReader {
             let size = $0.size
-
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 0) {
                     ForEach(items.indices, id: \.self) { index in
                         let item = items[index]
                         let isActive = currentIndex == index
-
                         VStack(spacing: 6) {
                             Text(item.title)
                                 .font(.custom("Inter18pt-SemiBold", size: 20))
                                 .lineLimit(1)
                                 .foregroundStyle(theme.primaryText)
-
                             Text(item.subtitle)
                                 .font(.custom("Inter18pt-Regular", size: 15))
                                 .lineLimit(2)
@@ -210,9 +218,7 @@ public struct OnBoarding: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(true)
             .scrollTargetBehavior(.paging)
-            .scrollPosition(id: .init(get: {
-                return currentIndex as Int?
-            }, set: { _ in }))
+            .scrollPosition(id: .init(get: { currentIndex as Int? }, set: { _ in }))
         }
     }
 
@@ -227,8 +233,11 @@ public struct OnBoarding: View {
                 Capsule()
                     .fill(theme.primaryText.opacity(isActive ? 1 : 0.4))
                     .frame(width: isActive ? 25 : 6, height: 6)
+                    .accessibilityLabel("Page \(index + 1)\(isActive ? ", current" : "")")
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Page \(currentIndex + 1) of \(items.count)")
     }
 
 
@@ -236,31 +245,36 @@ public struct OnBoarding: View {
 
     @ViewBuilder
     func ContinueButton() -> some View {
-        let label = Text(currentIndex == items.count - 1 ? "Get Started" : "Continue")
-            .font(.custom("Inter18pt-Medium", size: 17))
-            .contentTransition(.numericText())
-            .padding(.vertical, 6)
+        let title = currentIndex == items.count - 1 ? getStartedTitle : continueTitle
 
         if #available(iOS 26, *) {
             Button {
                 handleContinue()
             } label: {
-                label
+                Text(title)
+                    .font(.custom("Inter18pt-Medium", size: 17))
+                    .contentTransition(.numericText())
+                    .padding(.vertical, 6)
             }
             .tint(tint)
             .buttonStyle(.glassProminent)
             .buttonSizing(.flexible)
             .padding(.horizontal, 30)
+            .accessibilityLabel(title)
         } else {
             Button {
                 handleContinue()
             } label: {
-                label
+                Text(title)
+                    .font(.custom("Inter18pt-Medium", size: 17))
+                    .contentTransition(.numericText())
+                    .padding(.vertical, 6)
                     .frame(maxWidth: .infinity)
             }
             .tint(tint)
             .buttonStyle(.borderedProminent)
             .padding(.horizontal, 30)
+            .accessibilityLabel(title)
         }
     }
 
@@ -295,6 +309,8 @@ public struct OnBoarding: View {
             .buttonBorderShape(.circle)
             .opacity(isHidden ? 0 : 1)
             .allowsHitTesting(!isHidden)
+            .accessibilityLabel("Previous page")
+            .accessibilityHidden(isHidden)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(.leading, 15)
             .padding(.top, 5)
@@ -312,8 +328,46 @@ public struct OnBoarding: View {
             .buttonBorderShape(.circle)
             .opacity(isHidden ? 0 : 1)
             .allowsHitTesting(!isHidden)
+            .accessibilityLabel("Previous page")
+            .accessibilityHidden(isHidden)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(.leading, 15)
+            .padding(.top, 5)
+        }
+    }
+
+
+    // MARK: - Dismiss Button (Settings flow)
+
+    @ViewBuilder
+    func DismissButton(action: @escaping () -> Void) -> some View {
+        if #available(iOS 26, *) {
+            Button {
+                action()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.title3)
+                    .frame(width: 20, height: 20)
+            }
+            .buttonStyle(.glass)
+            .buttonBorderShape(.circle)
+            .accessibilityLabel("Dismiss")
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .padding(.trailing, 15)
+            .padding(.top, 5)
+        } else {
+            Button {
+                action()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.title3)
+                    .frame(width: 20, height: 20)
+            }
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+            .accessibilityLabel("Dismiss")
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .padding(.trailing, 15)
             .padding(.top, 5)
         }
     }
@@ -361,7 +415,7 @@ public struct OnBoarding: View {
 // MARK: - Theme
 
 extension OnBoarding {
-    public enum Theme {
+    public enum Theme: Sendable {
         case dark
         case light
 
@@ -414,7 +468,7 @@ extension OnBoarding {
 // MARK: - Item
 
 extension OnBoarding {
-    public struct Item: Identifiable {
+    public struct Item: Identifiable, Sendable {
         public var id: UUID
         public var title: String
         public var subtitle: String
