@@ -9,12 +9,25 @@ import SwiftUI
 
 struct OnBoarding: View {
     var tint: Color = .blue
+    var hideBezels: Bool = false
     var items: [Item]
+    var onComplete: () -> ()
     /// View Properties
     @State private var currentIndex: Int = 0
+    @State private var screenshotSize: CGSize = .zero
     
     var body: some View {
         ZStack(alignment: .bottom) {
+            
+            ScreenshotView()
+                .compositingGroup()
+                .scaleEffect(
+                    items[currentIndex].zoomScale,
+                    anchor: items[currentIndex].zoomAnchor)
+                .padding(.top, 35)
+                .padding(.horizontal, 30)
+                .padding(.bottom, 220)
+            
             VStack(spacing: 10) {
                 TextContentView()
                 IndicatorView()
@@ -23,13 +36,91 @@ struct OnBoarding: View {
             .padding(.top, 20)
             .padding(.horizontal, 15)
             .frame(height: 210)
+            .background {
+                VariableGlassBlur(18)
+            }
             BackButton()
             
         }
         .preferredColorScheme(.dark)
     }
     
+    
+    
+    /// Screenshot View
+    @ViewBuilder
+    func ScreenshotView() -> some View {
+        let shape = ConcentricRectangle(corners: .concentric, isUniform: true)
+        GeometryReader {
+            let size = $0.size
+            
+            Rectangle()
+                .fill(.black)
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: 12) {
+                    ForEach(items.indices, id: \.self) { index in
+                        
+                        let item = items[index]
+                        
+                        Group {
+                            if let screenshot = item.screenshot {
+                                Image(uiImage: screenshot)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .onGeometryChange(for: CGSize.self) {
+                                        $0.size
+                                    } action: { newValue in
+                                        screenshotSize = newValue
+                                    }
+                                    .clipShape(shape)
+
+                            } else {
+                                Rectangle()
+                                    .fill(.black)
+                            }
+                        }
+                        .frame(width: size.width, height: size.height)
+                        
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .scrollDisabled(true)
+            .scrollTargetBehavior(.viewAligned)
+            .scrollIndicators(.hidden)
+            .scrollPosition(id: .init(get: {
+                return currentIndex
+            }, set: { _ in
+                
+            }))
+        }
+        .clipShape(shape)
+        .overlay {
+            if screenshotSize != .zero && !hideBezels {
+                /// Device Frame UI
+                ZStack {
+                    shape
+                        .stroke(.white, lineWidth: 6)
+                    shape
+                        .stroke(.black, lineWidth: 4)
+                    shape
+                        .stroke(.black, lineWidth: 6)
+                        .padding(4)
+                }
+                .padding(-6)
+            }
+        }
         
+        .frame(
+            maxWidth: screenshotSize.width == 0 ? nil : screenshotSize.width,
+            maxHeight: screenshotSize.height == 0 ? nil : screenshotSize.height
+        )
+        .containerShape(RoundedRectangle(cornerRadius: deviceCornerRadius))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    
     
     /// Text Content View
     @ViewBuilder
@@ -42,18 +133,19 @@ struct OnBoarding: View {
                     ForEach(items.indices, id: \.self) { index in
                         let item = items[index]
                         let isActive = currentIndex == index
-
+                        
                         VStack(spacing: 6) {
                             Text(item.title)
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .lineLimit(1)
-                            .foregroundStyle(.white)
-
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                                .foregroundStyle(.white)
+                            
                             Text(item.subtitle)
-                            .font(.callout)
-                            .foregroundStyle(.white.opacity(0.8))
-
+                                .font(.callout)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(.white.opacity(0.8))
                         }
                         .frame(width: size.width)
                         .compositingGroup()
@@ -92,19 +184,26 @@ struct OnBoarding: View {
     @ViewBuilder
     func ContinueButton() -> some View {
         Button {
+            
+            if currentIndex == items.count - 1 {
+                onComplete()
+            }
+            
             withAnimation(animation) {
                 currentIndex = min(currentIndex + 1, items.count - 1)
             }
+            
         } label: {
-            Text("Continue")
+            Text(currentIndex == items.count - 1 ? "Get Started" : "Continue")
                 .fontWeight(.medium)
+                .contentTransition(.numericText())
                 .padding(.vertical, 6)
         }
         .tint(tint)
         .buttonStyle(.glassProminent)
         .buttonSizing(.flexible)
         .padding(.horizontal, 30)
-//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        //        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
     
     /// Back Button
@@ -124,6 +223,31 @@ struct OnBoarding: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(.leading, 15)
         .padding(.top, 5)
+    }
+    
+    /// Variable Glass Effect Blur
+    @ViewBuilder
+    func VariableGlassBlur(_ radius: CGFloat) -> some View {
+        let tint: Color = .black.opacity(0.5)
+        Rectangle()
+            .fill(.clear)
+            .glassEffect(.clear.tint(tint), in: .rect)
+            .blur(radius: radius)
+            .padding([.horizontal, .bottom], -radius * 2)
+        /// OPTIONAL :
+        /// Only Visible for scaled screenshots!ﬁ
+            .opacity(items[currentIndex].zoomScale != 1 ? 1 : 0)
+            .ignoresSafeArea()
+    }
+    
+    
+    var deviceCornerRadius: CGFloat {
+        if let imageSize = items.first?.screenshot?.size {
+            let ratio = screenshotSize.height / imageSize.height
+            let actualCornerRadius: CGFloat = 190
+            return actualCornerRadius * ratio
+        }
+        return 0
     }
     
     
