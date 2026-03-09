@@ -113,7 +113,7 @@ struct OnBoarding: View {
                     shape
                         .stroke(theme.bezelOuter, lineWidth: 6)
                     shape
-                        .stroke(theme.bezelInner, lineWidth: 4)
+                        .stroke(theme.bezelInner, lineWidth: 2)
                     shape
                         .stroke(theme.bezelInner, lineWidth: 6)
                         .padding(4)

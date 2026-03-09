@@ -13,7 +13,7 @@ struct ContentView: View {
     private static let subtitle = "Introducing a new design with\nLiquid Glass."
 
     var body: some View {
-        OnBoarding(tint: .orange, hideBezels: false, theme: .light, hidesBackButtonOnFirstItem: true, items: [
+        OnBoarding(tint: .orange, hideBezels: false, theme: .dark, hidesBackButtonOnFirstItem: true, items: [
             .init(title: Self.title, subtitle: Self.subtitle, screenshot: Self.screenImage),
             .init(title: Self.title, subtitle: Self.subtitle, screenshot: Self.screenImage),
             .init(title: Self.title, subtitle: Self.subtitle, screenshot: Self.screenImage, zoomScale: 1.3, zoomAnchor: .bottom),
