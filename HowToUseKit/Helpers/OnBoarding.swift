@@ -244,7 +244,7 @@ struct OnBoarding: View {
     var deviceCornerRadius: CGFloat {
         if let imageSize = items.first?.screenshot?.size {
             let ratio = screenshotSize.height / imageSize.height
-            let actualCornerRadius: CGFloat = 190
+            let actualCornerRadius: CGFloat = 70
             return actualCornerRadius * ratio
         }
         return 0

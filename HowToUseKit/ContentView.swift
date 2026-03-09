@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        let image = UIImage(named: "Screen")
+        let image = UIImage(named: "screenshot")
         let title = "Welcome to iOS 26"
         let subtitle = "Introducing a new design with\nLiquid Glass."
         OnBoarding(tint: .orange, hideBezels: false, items: [
