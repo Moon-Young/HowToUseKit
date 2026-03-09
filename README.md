@@ -14,7 +14,7 @@ iOS onboarding UI component with Liquid Glass design support.
 **Swift Package Manager**
 
 ```
-https://github.com/your-username/HowToUseKit
+https://github.com/Moon-Young/HowToUseKit
 ```
 
 ---
