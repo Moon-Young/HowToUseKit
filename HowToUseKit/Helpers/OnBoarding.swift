@@ -296,7 +296,7 @@ struct OnBoarding: View {
         var bezelInner: Color {
             switch self {
             case .dark: return .black
-            case .light: return .white
+            case .light: return .black
             }
         }
         var glassTint: Color {
