@@ -11,7 +11,7 @@ import CoreText
 
 // MARK: - Font Registration
 
-private nonisolated(unsafe) let registerFontsOnce: Void = {
+nonisolated(unsafe) let registerFontsOnce: Void = {
     let fontNames = [
         "Inter_18pt-Regular",
         "Inter_18pt-Medium",

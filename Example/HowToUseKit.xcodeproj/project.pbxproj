@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5CFDDF2C2F659A3F00861E2E /* HowToUseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5CFDDF2B2F659A3F00861E2E /* HowToUseKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		858306522F5A73ED00C9CA1D /* HowToUseKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HowToUseKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5CFDDF2C2F659A3F00861E2E /* HowToUseKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,8 +81,9 @@
 			fileSystemSynchronizedGroups = (
 				858306542F5A73ED00C9CA1D /* HowToUseKit */,
 			);
-			name = HowToUseKit;
+			name = HowToUseKitDemo;
 			packageProductDependencies = (
+				5CFDDF2B2F659A3F00861E2E /* HowToUseKit */,
 			);
 			productName = HowToUseKit;
 			productReference = 858306522F5A73ED00C9CA1D /* HowToUseKit.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 858306492F5A73EC00C9CA1D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference "../OffstudioKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 858306532F5A73ED00C9CA1D /* Products */;
 			projectDirPath = "";
@@ -270,6 +279,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HowToUseKit/Info.plist;
+				PRODUCT_MODULE_NAME = HowToUseKitApp;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -303,6 +313,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HowToUseKit/Info.plist;
+				PRODUCT_MODULE_NAME = HowToUseKitApp;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -347,6 +358,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference "../OffstudioKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5CFDDF2B2F659A3F00861E2E /* HowToUseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference "../OffstudioKit" */;
+			productName = HowToUseKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8583064A2F5A73ED00C9CA1D /* Project object */;
 }
