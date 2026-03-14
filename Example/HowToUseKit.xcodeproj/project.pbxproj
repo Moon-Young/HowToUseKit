@@ -11,16 +11,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		858306522F5A73ED00C9CA1D /* HowToUseKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HowToUseKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		858306522F5A73ED00C9CA1D /* HowToUseKitDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HowToUseKitDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		853216E52F5E918500F27BEF /* Exceptions for "HowToUseKit" folder in "HowToUseKit" target */ = {
+		853216E52F5E918500F27BEF /* Exceptions for "HowToUseKit" folder in "HowToUseKitDemo" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 858306512F5A73ED00C9CA1D /* HowToUseKit */;
+			target = 858306512F5A73ED00C9CA1D /* HowToUseKitDemo */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -28,7 +28,7 @@
 		858306542F5A73ED00C9CA1D /* HowToUseKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				853216E52F5E918500F27BEF /* Exceptions for "HowToUseKit" folder in "HowToUseKit" target */,
+				853216E52F5E918500F27BEF /* Exceptions for "HowToUseKit" folder in "HowToUseKitDemo" target */,
 			);
 			path = HowToUseKit;
 			sourceTree = "<group>";
@@ -58,7 +58,7 @@
 		858306532F5A73ED00C9CA1D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				858306522F5A73ED00C9CA1D /* HowToUseKit.app */,
+				858306522F5A73ED00C9CA1D /* HowToUseKitDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -66,9 +66,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		858306512F5A73ED00C9CA1D /* HowToUseKit */ = {
+		858306512F5A73ED00C9CA1D /* HowToUseKitDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8583065D2F5A73EE00C9CA1D /* Build configuration list for PBXNativeTarget "HowToUseKit" */;
+			buildConfigurationList = 8583065D2F5A73EE00C9CA1D /* Build configuration list for PBXNativeTarget "HowToUseKitDemo" */;
 			buildPhases = (
 				8583064E2F5A73ED00C9CA1D /* Sources */,
 				8583064F2F5A73ED00C9CA1D /* Frameworks */,
@@ -86,7 +86,7 @@
 				5CFDDF2B2F659A3F00861E2E /* HowToUseKit */,
 			);
 			productName = HowToUseKit;
-			productReference = 858306522F5A73ED00C9CA1D /* HowToUseKit.app */;
+			productReference = 858306522F5A73ED00C9CA1D /* HowToUseKitDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -114,14 +114,14 @@
 			mainGroup = 858306492F5A73EC00C9CA1D;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference "../OffstudioKit" */,
+				5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference ".." */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 858306532F5A73ED00C9CA1D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				858306512F5A73ED00C9CA1D /* HowToUseKit */,
+				858306512F5A73ED00C9CA1D /* HowToUseKitDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -279,7 +279,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HowToUseKit/Info.plist;
-				PRODUCT_MODULE_NAME = HowToUseKitApp;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -291,6 +290,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.offstudio.HowToUseKit;
+				PRODUCT_MODULE_NAME = HowToUseKitApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -313,7 +313,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HowToUseKit/Info.plist;
-				PRODUCT_MODULE_NAME = HowToUseKitApp;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -325,6 +324,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.offstudio.HowToUseKit;
+				PRODUCT_MODULE_NAME = HowToUseKitApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -348,7 +348,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8583065D2F5A73EE00C9CA1D /* Build configuration list for PBXNativeTarget "HowToUseKit" */ = {
+		8583065D2F5A73EE00C9CA1D /* Build configuration list for PBXNativeTarget "HowToUseKitDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8583065E2F5A73EE00C9CA1D /* Debug */,
@@ -360,7 +360,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference "../OffstudioKit" */ = {
+		5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference ".." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ..;
 		};
@@ -369,7 +369,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		5CFDDF2B2F659A3F00861E2E /* HowToUseKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference "../OffstudioKit" */;
+			package = 5CFDDF2A2F659A3F00861E2E /* XCLocalSwiftPackageReference ".." */;
 			productName = HowToUseKit;
 		};
 /* End XCSwiftPackageProductDependency section */

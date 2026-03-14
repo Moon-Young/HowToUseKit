@@ -103,6 +103,7 @@ struct SettingsDemo: View {
     @State private var expandableTab = true
     @State private var multiSelect = false
     @State private var useAppNotif = false
+    @State private var showHowToUse = false
 
     var subscriptionState: SettingView.Item.SubscriptionState {
         isSubscribed
@@ -211,21 +212,20 @@ struct SettingsDemo: View {
 
                 // MARK: Support
                 .init(items: [
-                    .navigation(
+                    .action(
                         icon: "questionmark.circle.fill",
-                        iconColor: .gray,
                         title: "How to Use",
-                        destination: { OnboardingDemo() }
+                        action: { showHowToUse = true }
                     ),
                     .link(
                         icon: "lock.fill",
                         title: "Privacy Policy",
-                        url: URL(string: "https://offstudio.notion.site/Privacy-Policy-OFFSTUDIO-1b95f84ba94780a387fad4e59d9bb139")!
+                        url: URL(string: "https://offstudio.notion.site/Privacy-Policy-OFFSTUDIO-1b95f84ba94780a387fad4e59d9bb139?pvs=74")!
                     ),
                     .link(
                         icon: "doc.text.fill",
                         title: "Terms of Service",
-                        url: URL(string: "https://offstudio.notion.site/Terms-of-Use-OFFSTUDIO-1b95f84ba94780569654ee08852cec9e")!
+                        url: URL(string: "https://offstudio.notion.site/Terms-of-Use-OFFSTUDIO-1b95f84ba94780569654ee08852cec9e?pvs=74")!
                     ),
                     .action(
                         icon: "envelope.fill",
@@ -235,15 +235,45 @@ struct SettingsDemo: View {
                     ),
                 ]),
             ],
-            footer: .init(developerName: "Developed by OFFSTUDIO")
+            footer: .init(
+                appIcon: UIImage(named: "AppIcon"),
+                developerName: "Developed by OFFSTUDIO"
+            )
         )
+        .fullScreenCover(isPresented: $showHowToUse) {
+            OnboardingDemo()
+        }
     }
+
+    // MARK: - Contact Us Email
 
     private func sendSupportEmail() {
         let email = "offstudioapp@gmail.com"
         let subject = "SECalendar App Support"
+
+        let device = UIDevice.current
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        let userStatus = isSubscribed ? "Premium User" : "Free User"
+
+        let body = """
+
+
+        [Please describe your inquiry here]
+
+
+        -------------------------------------------
+        Device Info for Developer Support:
+        Device: \(device.modelName)
+        OS: \(device.systemName) \(device.systemVersion)
+        App Version: \(appVersion) (\(buildNumber))
+        User Status: \(userStatus)
+        -------------------------------------------
+        """
+
         let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        if let url = URL(string: "mailto:\(email)?subject=\(encodedSubject)") {
+        let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "mailto:\(email)?subject=\(encodedSubject)&body=\(encodedBody)") {
             UIApplication.shared.open(url)
         }
     }

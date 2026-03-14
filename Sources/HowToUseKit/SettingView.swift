@@ -38,23 +38,32 @@ public struct SettingView: View {
 
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 0) {
-                    ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
-                        SectionView(section: section)
-                    }
-                    if let footer {
-                        FooterView(footer: footer)
-                            .padding(.top, 36)
-                            .padding(.bottom, 20)
+            List {
+                ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
+                    SwiftUI.Section {
+                        ForEach(Array(section.items.enumerated()), id: \.offset) { _, item in
+                            ItemView(item: item)
+                        }
+                    } header: {
+                        if let header = section.header {
+                            Text(header)
+                        }
+                    } footer: {
+                        if let sectionFooter = section.footer {
+                            Text(sectionFooter)
+                        }
                     }
                 }
-                .padding(.top, 8)
-                .padding(.bottom, 32)
+
+                if let footer {
+                    SwiftUI.Section {
+                        FooterView(footer: footer)
+                    }
+                    .listRowBackground(Color.clear)
+                }
             }
-            .background(theme.listBackground)
             .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 if let onDismiss {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -74,98 +83,54 @@ public struct SettingView: View {
     }
 
 
-    // MARK: - Section View
-
-    @ViewBuilder
-    func SectionView(section: Section) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if let header = section.header {
-                Text(header)
-                    .font(.custom("Inter18pt-SemiBold", size: 15))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 24)
-                    .padding(.bottom, 6)
-            } else {
-                Spacer().frame(height: 20)
-            }
-
-            VStack(spacing: 0) {
-                ForEach(Array(section.items.enumerated()), id: \.offset) { index, item in
-                    ItemView(item: item)
-                    if index < section.items.count - 1 {
-                        Divider()
-                            .padding(.leading, item.dividerLeading)
-                    }
-                }
-            }
-            .background(theme.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .padding(.horizontal, 16)
-
-            if let footer = section.footer {
-                Text(footer)
-                    .font(.custom("Inter18pt-Regular", size: 13))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 6)
-            }
-        }
-    }
-
-
     // MARK: - Item View
 
     @ViewBuilder
     func ItemView(item: Item) -> some View {
-        Group {
-            switch item.kind {
-            case let .toggle(icon, iconColor, title, subtitle, isOn, contextMenu):
-                ToggleItemView(icon: icon, iconColor: iconColor,
-                               title: title, subtitle: subtitle, isOn: isOn)
-                    .contextMenuIfNeeded(contextMenu)
-
-            case let .navigation(icon, iconColor, title, value, style, destination, contextMenu):
-                NavigationLink(destination: destination) {
-                    NavigationItemContent(icon: icon, iconColor: iconColor,
-                                         title: title, value: value, style: style)
-                }
-                .buttonStyle(.plain)
+        switch item.kind {
+        case let .toggle(icon, iconColor, title, subtitle, isOn, contextMenu):
+            ToggleItemView(icon: icon, iconColor: iconColor,
+                           title: title, subtitle: subtitle, isOn: isOn)
                 .contextMenuIfNeeded(contextMenu)
 
-            case let .link(icon, title, url, tintColor, contextMenu):
-                Link(destination: url) {
-                    LinkItemContent(icon: icon, title: title, tintColor: tintColor)
-                }
-                .buttonStyle(.plain)
-                .contextMenuIfNeeded(contextMenu)
-
-            case let .action(icon, title, tintColor, action, contextMenu):
-                Button(action: action) {
-                    ActionItemContent(icon: icon, title: title, tintColor: tintColor)
-                }
-                .buttonStyle(.plain)
-                .contextMenuIfNeeded(contextMenu)
-
-            case let .permission(icon, iconColor, title, subtitle, status, action):
-                PermissionItemView(icon: icon, iconColor: iconColor,
-                                   title: title, subtitle: subtitle, status: status, action: action)
-
-            case let .subscription(icon, iconColor, title, subtitle, state, destination):
-                NavigationLink(destination: destination) {
-                    SubscriptionItemContent(icon: icon, iconColor: iconColor,
-                                            title: title, subtitle: subtitle,
-                                            state: state, tint: tint)
-                }
-                .buttonStyle(.plain)
-
-            case let .custom(view):
-                view
+        case let .navigation(icon, iconColor, title, value, style, destination, contextMenu):
+            NavigationLink(destination: destination) {
+                NavigationItemContent(icon: icon, iconColor: iconColor,
+                                     title: title, value: value, style: style)
             }
+            .contextMenuIfNeeded(contextMenu)
+
+        case let .link(icon, title, url, tintColor, contextMenu):
+            Link(destination: url) {
+                LinkItemContent(icon: icon, title: title, tintColor: tintColor)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            .contextMenuIfNeeded(contextMenu)
+
+        case let .action(icon, title, tintColor, action, contextMenu):
+            Button(action: action) {
+                ActionItemContent(icon: icon, title: title, tintColor: tintColor)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .buttonStyle(.plain)
+            .contextMenuIfNeeded(contextMenu)
+
+        case let .permission(icon, iconColor, title, subtitle, status, action):
+            PermissionItemView(icon: icon, iconColor: iconColor,
+                               title: title, subtitle: subtitle, status: status, action: action)
+
+        case let .subscription(icon, iconColor, title, subtitle, state, destination):
+            NavigationLink(destination: destination) {
+                SubscriptionItemContent(icon: icon, iconColor: iconColor,
+                                        title: title, subtitle: subtitle,
+                                        state: state, tint: tint)
+            }
+
+        case let .custom(view):
+            view
         }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
     }
 
 
@@ -182,7 +147,7 @@ public struct SettingView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.custom("Inter18pt-Regular", size: 16))
-                    .foregroundStyle(theme.primaryText)
+                    .foregroundStyle(.primary)
                 if let subtitle {
                     Text(subtitle)
                         .font(.custom("Inter18pt-Regular", size: 13))
@@ -214,19 +179,15 @@ public struct SettingView: View {
             }
             Text(title)
                 .font(.custom("Inter18pt-Regular", size: 16))
-                .foregroundStyle(theme.primaryText)
+                .foregroundStyle(.primary)
             Spacer()
             if let value {
                 Text(value)
                     .font(.custom("Inter18pt-Regular", size: 15))
                     .foregroundStyle(.secondary)
             }
-            switch style {
-            case .push:
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color(.systemGray3))
-            case .external:
+            // List adds disclosure indicator for .push; show arrow only for .external
+            if case .external = style {
                 Image(systemName: "arrow.up.right")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color(.systemGray3))
@@ -243,12 +204,12 @@ public struct SettingView: View {
             if let icon {
                 Image(systemName: icon)
                     .font(.system(size: 15))
-                    .foregroundStyle(tintColor ?? theme.primaryText)
+                    .foregroundStyle(tintColor ?? .primary)
                     .frame(width: 28, height: 28)
             }
             Text(title)
                 .font(.custom("Inter18pt-Regular", size: 16))
-                .foregroundStyle(tintColor ?? theme.primaryText)
+                .foregroundStyle(tintColor ?? .primary)
             Spacer()
             Image(systemName: "arrow.up.right")
                 .font(.system(size: 13, weight: .semibold))
@@ -265,12 +226,12 @@ public struct SettingView: View {
             if let icon {
                 Image(systemName: icon)
                     .font(.system(size: 15))
-                    .foregroundStyle(tintColor ?? theme.primaryText)
+                    .foregroundStyle(tintColor ?? .primary)
                     .frame(width: 28, height: 28)
             }
             Text(title)
                 .font(.custom("Inter18pt-Regular", size: 16))
-                .foregroundStyle(tintColor ?? theme.primaryText)
+                .foregroundStyle(tintColor ?? .primary)
             Spacer()
         }
     }
@@ -292,7 +253,7 @@ public struct SettingView: View {
                     HStack(spacing: 6) {
                         Text(title)
                             .font(.custom("Inter18pt-Regular", size: 16))
-                            .foregroundStyle(theme.primaryText)
+                            .foregroundStyle(.primary)
                         status.badge
                     }
                     Text(subtitle)
@@ -324,7 +285,7 @@ public struct SettingView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.custom("Inter18pt-SemiBold", size: 16))
-                    .foregroundStyle(theme.primaryText)
+                    .foregroundStyle(.primary)
                 Text(subtitle)
                     .font(.custom("Inter18pt-Regular", size: 13))
                     .foregroundStyle(.secondary)
@@ -356,27 +317,28 @@ public struct SettingView: View {
 
     @ViewBuilder
     func FooterView(footer: Footer) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             if let icon = footer.resolvedAppIcon {
                 Image(uiImage: icon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+                    .frame(width: 80, height: 80)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .shadow(color: .black.opacity(0.12), radius: 8, x: 0, y: 3)
             }
             Text(footer.resolvedAppName)
-                .font(.custom("Inter18pt-Bold", size: 16))
-                .foregroundStyle(theme.primaryText)
+                .font(.title3.bold())
             Text("Version \(footer.versionString)")
-                .font(.custom("Inter18pt-Regular", size: 13))
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
             if let developerName = footer.developerName {
                 Text(developerName)
-                    .font(.custom("Inter18pt-Regular", size: 13))
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
     }
 
 
@@ -385,10 +347,10 @@ public struct SettingView: View {
     @ViewBuilder
     func IconView(systemName: String, color: Color) -> some View {
         Image(systemName: systemName)
-            .font(.system(size: 14, weight: .semibold))
+            .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(.white)
-            .frame(width: 30, height: 30)
-            .background(color, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+            .frame(width: 28, height: 28)
+            .background(color, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 }
 
@@ -500,18 +462,6 @@ extension SettingView {
         }
 
         let kind: Kind
-
-        var dividerLeading: CGFloat {
-            switch kind {
-            case .toggle(let icon, let iconColor, _, _, _, _):
-                return (icon != nil && iconColor != nil) ? 58 : 16
-            case .navigation(let icon, let iconColor, _, _, _, _, _):
-                return (icon != nil && iconColor != nil) ? 58 : 16
-            case .subscription: return 58
-            case .permission: return 58
-            default: return 16
-            }
-        }
 
 
         // MARK: Factory Methods
@@ -645,25 +595,6 @@ extension SettingView {
             let short = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
             let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
             return "\(short) (\(build))"
-        }
-    }
-}
-
-
-// MARK: - Theme Extension
-
-extension OnBoarding.Theme {
-    var listBackground: Color {
-        switch self {
-        case .dark: return Color(.systemBackground)
-        case .light: return Color(.systemGroupedBackground)
-        }
-    }
-
-    var cardBackground: Color {
-        switch self {
-        case .dark: return Color(.secondarySystemBackground)
-        case .light: return Color(.secondarySystemGroupedBackground)
         }
     }
 }
