@@ -501,22 +501,22 @@ extension Paywall {
 extension OnBoarding.Theme {
     var paywallBackground: Color {
         switch self {
-        case .dark: return Color(.systemBackground)
-        case .light: return Color(.systemBackground)
+        case .dark: return Color(red: 0.06, green: 0.06, blue: 0.06)
+        case .light: return Color(red: 0.97, green: 0.97, blue: 0.97)
         }
     }
 
     var planCardBackground: Color {
         switch self {
-        case .dark: return Color(.secondarySystemBackground)
-        case .light: return Color(.secondarySystemGroupedBackground)
+        case .dark: return Color(red: 0.13, green: 0.13, blue: 0.13)
+        case .light: return Color.white
         }
     }
 
     var closeButtonBackground: Color {
         switch self {
-        case .dark: return Color(.systemGray5)
-        case .light: return Color(.systemGray5)
+        case .dark: return Color(white: 1, opacity: 0.15)
+        case .light: return Color(white: 0, opacity: 0.08)
         }
     }
 }

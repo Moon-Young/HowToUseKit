@@ -81,7 +81,7 @@ public struct SettingView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let header = section.header {
                 Text(header)
-                    .font(.custom("Inter18pt-SemiBold", size: 13))
+                    .font(.custom("Inter18pt-SemiBold", size: 15))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 20)
                     .padding(.top, 24)
